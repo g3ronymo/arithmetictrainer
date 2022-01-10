@@ -3,10 +3,45 @@ Commandline interface.
 """
 import sys
 import time
+import os
 import argparse
+from pathlib import Path
 from decimal import Decimal, InvalidOperation
 from arithmetictrainer import Arithmetictrainer
 from utils import create_taskgenerators_from_file
+
+parser = argparse.ArgumentParser(
+    prog="Arithmetictrainer",
+    description="Train mental arithmetic",
+)
+parser.add_argument(
+        '-n',
+        '--number',
+        type=int,
+        default=10,
+        help='Number of tasks to solve'
+)
+parser.add_argument(
+        '-c',
+        '--config',
+        type=str,
+        help='Path to configuration file'
+)
+args = parser.parse_args()
+
+def get_config() -> Path:
+    if args.config and Path(args.config).is_file():
+        config = Path(args.config)
+    elif Path(os.environ.get('XDG_CONFIG_HOME', '~/.config')
+        ).joinpath('arithmetictrainer/config').is_file():
+        config = Path(
+                os.environ.get('XDG_CONFIG_HOME', '~/.config')
+                ).joinpath('arithmetictrainer/config')
+    elif Path.cwd().joinpath('config').is_file():
+        config = Path.cwd().joinpath('config')
+    else:
+        config = Path(__file__).parent.joinpath('data/config'),
+    return config
 
 def get_answer(task: dict) -> Decimal:
     """
@@ -29,26 +64,10 @@ def get_answer(task: dict) -> Decimal:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        prog="Arithmetictrainer",
-        description="Train mental arithmetic",
-    )
-    parser.add_argument(
-            '-n',
-            '--number-of-tasks',
-            type=int,
-            default=10,
-            help='Number of tasks to solve'
-    )
-    args = parser.parse_args()
-    possible_config_places = [
-        'config',
-        'data/config',
-    ]
-    taskgen_list = create_taskgenerators_from_file(possible_config_places)
+    taskgen_list = create_taskgenerators_from_file(get_config())
     trainer = Arithmetictrainer(taskgen_list)
     started_at = time.time()
-    for i in range(args.number_of_tasks):
+    for i in range(args.number):
         answer = False
         while not answer:
             try:
