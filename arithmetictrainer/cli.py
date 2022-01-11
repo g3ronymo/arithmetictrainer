@@ -10,26 +10,28 @@ from decimal import Decimal, InvalidOperation
 from arithmetictrainer import Arithmetictrainer
 from utils import create_taskgenerators_from_file
 
-parser = argparse.ArgumentParser(
-    prog="Arithmetictrainer",
-    description="Train mental arithmetic",
-)
-parser.add_argument(
-        '-n',
-        '--number',
-        type=int,
-        default=10,
-        help='Number of tasks to solve'
-)
-parser.add_argument(
-        '-c',
-        '--config',
-        type=str,
-        help='Path to configuration file'
-)
-args = parser.parse_args()
+def parse_args():
+    """Parse commandline arguments"""
+    parser = argparse.ArgumentParser(
+        prog="Arithmetictrainer",
+        description="Train mental arithmetic",
+    )
+    parser.add_argument(
+            '-n',
+            '--number',
+            type=int,
+            default=10,
+            help='Number of tasks to solve'
+    )
+    parser.add_argument(
+            '-c',
+            '--config',
+            type=str,
+            help='Path to configuration file'
+    )
+    return parser.parse_args()
 
-def get_config() -> Path:
+def get_config(args) -> Path:
     if args.config and Path(args.config).is_file():
         config = Path(args.config)
     elif Path(os.environ.get('XDG_CONFIG_HOME', '~/.config')
@@ -64,7 +66,8 @@ def get_answer(task: dict) -> Decimal:
 
 
 def main():
-    taskgen_list = create_taskgenerators_from_file(get_config())
+    args = parse_args()
+    taskgen_list = create_taskgenerators_from_file(get_config(args))
     trainer = Arithmetictrainer(taskgen_list)
     started_at = time.time()
     for i in range(args.number):
