@@ -23,7 +23,7 @@ class NumberGenerator:
         x = Decimal(x)
         x = round(x, self.decimal_points)
         while not allow_zero and x == Decimal(0):
-            x = random.randint(min, max) * random.random()
+            x = random.randint(self.min_value, self.max_value) * random.random()
             x = Decimal(x)
             x = round(x, self.decimal_points)
         return x
