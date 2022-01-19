@@ -1,11 +1,11 @@
 import unittest
 from decimal import Decimal
 import context
-from arithmetictrainer import arithmetictrainer as ar
+from arithmetictrainer import core
 
 class NumberGeneratorTest(unittest.TestCase):
     def setUp(self):
-        self.numgen = ar.NumberGenerator(-100, 100, 1)
+        self.numgen = core.NumberGenerator(-100, 100, 1)
 
     def test_get_number(self):
         for i in range(100):
@@ -17,12 +17,12 @@ class NumberGeneratorTest(unittest.TestCase):
 class ArithmetictrainerTest(unittest.TestCase):
     def setUp(self):
         taskgens = [
-                ar.Taskgenerator(ar.Addition, -100, 100, 2, 1),
-                ar.Taskgenerator(ar.Subtraction, -100, 100, 2, 1),
-                ar.Taskgenerator(ar.Multiplication, -100, 100, 2, 1),
-                ar.Taskgenerator(ar.Division, -100, 100, 2, 1),
+                core.Taskgenerator(core.Addition, -100, 100, 2, 1),
+                core.Taskgenerator(core.Subtraction, -100, 100, 2, 1),
+                core.Taskgenerator(core.Multiplication, -100, 100, 2, 1),
+                core.Taskgenerator(core.Division, -100, 100, 2, 1),
         ]
-        self.trainer = ar.Arithmetictrainer(taskgens)
+        self.trainer = core.Arithmetictrainer(taskgens)
 
     def test_answer(self):
         current_task = self.trainer.current_task

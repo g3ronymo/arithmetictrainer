@@ -1,9 +1,10 @@
 import configparser
-import arithmetictrainer
 import time
+from core import Taskgenerator
+from core import Addition, Subtraction, Multiplication, Division
 
 
-def create_taskgenerators_from_file(path) -> list[arithmetictrainer.Taskgenerator]:
+def create_taskgenerators_from_file(path) -> list[Taskgenerator]:
     """
     Great list with Objects from type Taskgenerator.
     path can be a string, path object or iterable thereof.
@@ -28,13 +29,13 @@ def create_taskgenerators_from_file(path) -> list[arithmetictrainer.Taskgenerato
         # get operator
          operator = config[section]['operator']
          if operator in ('+'):
-             operator = arithmetictrainer.Addition
+             operator = Addition
          elif operator in ('-'):
-             operator = arithmetictrainer.Subtraction
+             operator = Subtraction
          elif operator in ('*'):
-             operator = arithmetictrainer.Multiplication
+             operator = Multiplication
          elif operator in ('/'):
-             operator = arithmetictrainer.Division
+             operator = Division
          else:
              raise KeyError(f'"{operator}" is not a valid operator')
          # get variable_min
@@ -47,7 +48,7 @@ def create_taskgenerators_from_file(path) -> list[arithmetictrainer.Taskgenerato
          variable_decimal_points = config.getint(
                  section, 'variable_decimal_points'
          )
-         taskgenerators.append(arithmetictrainer.Taskgenerator(
+         taskgenerators.append(Taskgenerator(
                  operator,
                  variable_min,
                  variable_max,

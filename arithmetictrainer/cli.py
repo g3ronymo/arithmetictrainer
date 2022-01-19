@@ -7,7 +7,9 @@ import os
 import argparse
 from pathlib import Path
 from decimal import Decimal, InvalidOperation
-from arithmetictrainer import Arithmetictrainer
+
+sys.path.insert(0, str(Path(__file__).parent))
+from core import Arithmetictrainer
 from utils import create_taskgenerators_from_file
 
 def parse_args():
