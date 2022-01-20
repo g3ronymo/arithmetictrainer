@@ -3,7 +3,7 @@ Arithmetictrainer
 ###############################################################################
 
 ``Arithmetictrainer`` can be used to practice mental arithmetic.
-Ther are no dependencies besides python.
+There are no dependencies besides python >=3.10.
 
 *******************************************************************************
 Development
