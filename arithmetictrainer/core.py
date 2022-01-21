@@ -5,36 +5,6 @@ from decimal import Decimal, getcontext
 from abc import ABC, abstractmethod
 
 
-class NumberGenerator:
-    """Generat numbers"""
-
-    def __init__(self, min_value: int, max_value: int, decimal_points: int):
-        self.min_value = min_value
-        self.max_value = max_value
-        self.decimal_points = decimal_points
-
-    def get_number(self, allow_zero=False) -> Decimal:
-        """
-        Get a number in range [min, max].
-        The number is rounded to  decimal_points.
-        """
-        getcontext().rounding = decimal.ROUND_HALF_UP
-        x = random.randint(self.min_value, self.max_value) * random.random()
-        x = Decimal(x)
-        x = round(x, self.decimal_points)
-        while not allow_zero and x == Decimal(0):
-            x = random.randint(self.min_value, self.max_value) * random.random()
-            x = Decimal(x)
-            x = round(x, self.decimal_points)
-        return x
-
-    def get_number_array(self, n: int, allow_zero=False) -> list[Decimal]:
-        """Get a list with generated numbers"""
-        l = []
-        for i in range(n):
-            l.append(self.get_number(allow_zero=allow_zero))
-        return l
-
 
 class Operator(ABC):
 
@@ -104,12 +74,17 @@ class Taskgenerator:
             variable_num: int,
             variable_decimal_points: int
             ):
+        if variable_min >= variable_max:
+            raise ValueError('"variable_min" is not less than "variable_max"')
+        if variable_num < 2:
+            raise ValueError('"variable_num" can not be less than 2')
+        if variable_decimal_points < 0:
+            raise ValueError('"variable_decimal_points" can not be less than zero')
+        self.variable_min = variable_min
+        self.variable_max = variable_max
         self.operator = operator
         self.variable_num = variable_num
         self.variable_decimal_points = variable_decimal_points
-        self.number_generator = NumberGenerator(
-                variable_min, variable_max, variable_decimal_points
-        )
 
     def get_task(self) -> dict:
         """
@@ -122,7 +97,7 @@ class Taskgenerator:
             }
         """
         task = dict()
-        variables = self.number_generator.get_number_array(self.variable_num)
+        variables = self.get_number_array(self.variable_num)
         x = self.operator.apply(variables)
         task['correct_answer'] = round(x, self.variable_decimal_points)
         task['result_decimal_points'] = self.variable_decimal_points
@@ -133,6 +108,27 @@ class Taskgenerator:
         task['task'] = task_str
         return task
 
+    def get_number(self, allow_zero=False) -> Decimal:
+        """
+        Get a number in range [min, max].
+        The number is rounded to  self.variable_decimal__points.
+        """
+        getcontext().rounding = decimal.ROUND_HALF_UP
+        x = random.randint(self.variable_min, self.variable_max) * random.random()
+        x = Decimal(x)
+        x = round(x, self.variable_decimal_points)
+        while not allow_zero and x == Decimal(0):
+            x = random.randint(self.variable_min, self.variable_max) * random.random()
+            x = Decimal(x)
+            x = round(x, self.variable_decimal_points)
+        return x
+
+    def get_number_array(self, allow_zero=False) -> list[Decimal]:
+        """Get a list with generated numbers"""
+        l = []
+        for i in range(self.variable_num):
+            l.append(self.get_number(allow_zero=allow_zero))
+        return l
 
 class Arithmetictrainer:
 

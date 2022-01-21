@@ -3,13 +3,14 @@ from decimal import Decimal
 import context
 from arithmetictrainer import core
 
-class NumberGeneratorTest(unittest.TestCase):
+
+class TaskgeneratorTest(unittest.TestCase):
     def setUp(self):
-        self.numgen = core.NumberGenerator(-100, 100, 1)
+        self.taskgen_addition = core.Taskgenerator(core.Addition, -100, 100, 2, 1)
 
     def test_get_number(self):
         for i in range(100):
-            num = self.numgen.get_number()
+            num = self.taskgen_addition.get_number()
             self.assertNotEqual(num, Decimal('0'))
             self.assertTrue(num >= Decimal(-100))
             self.assertTrue(num <= Decimal(100))
