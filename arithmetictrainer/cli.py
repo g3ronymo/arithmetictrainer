@@ -11,6 +11,7 @@ from decimal import Decimal, InvalidOperation
 sys.path.insert(0, str(Path(__file__).parent))
 from core import Arithmetictrainer
 from utils import create_taskgenerators_from_file
+from __init__ import version
 
 def parse_args():
     """Parse commandline arguments"""
@@ -30,6 +31,9 @@ def parse_args():
             '--config',
             type=str,
             help='Path to configuration file'
+    )
+    parser.add_argument(
+            '--version', action='version', version=f'%(prog)s {version}'
     )
     return parser.parse_args()
 

@@ -10,7 +10,7 @@ class TaskgeneratorTest(unittest.TestCase):
 
     def test_get_number(self):
         for i in range(100):
-            num = self.taskgen_addition.get_number()
+            num = self.taskgen_addition._get_number()
             self.assertNotEqual(num, Decimal('0'))
             self.assertTrue(num >= Decimal(-100))
             self.assertTrue(num <= Decimal(100))

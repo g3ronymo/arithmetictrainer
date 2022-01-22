@@ -97,7 +97,7 @@ class Taskgenerator:
             }
         """
         task = dict()
-        variables = self.get_number_array(self.variable_num)
+        variables = self._get_number_array(self.variable_num)
         x = self.operator.apply(variables)
         task['correct_answer'] = round(x, self.variable_decimal_points)
         task['result_decimal_points'] = self.variable_decimal_points
@@ -108,7 +108,7 @@ class Taskgenerator:
         task['task'] = task_str
         return task
 
-    def get_number(self, allow_zero=False) -> Decimal:
+    def _get_number(self, allow_zero=False) -> Decimal:
         """
         Get a number in range [min, max].
         The number is rounded to  self.variable_decimal__points.
@@ -123,11 +123,11 @@ class Taskgenerator:
             x = round(x, self.variable_decimal_points)
         return x
 
-    def get_number_array(self, allow_zero=False) -> list[Decimal]:
+    def _get_number_array(self, allow_zero=False) -> list[Decimal]:
         """Get a list with generated numbers"""
         l = []
         for i in range(self.variable_num):
-            l.append(self.get_number(allow_zero=allow_zero))
+            l.append(self._get_number(allow_zero=allow_zero))
         return l
 
 class Arithmetictrainer:
