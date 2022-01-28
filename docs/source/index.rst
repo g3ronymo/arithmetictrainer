@@ -10,13 +10,6 @@ Welcome to Arithmetictrainer's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   Modules
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   core
+   utils
+   cli

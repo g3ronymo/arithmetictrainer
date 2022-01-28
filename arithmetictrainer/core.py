@@ -1,3 +1,6 @@
+"""
+Core objects.
+"""
 import random
 import functools
 import decimal
@@ -11,11 +14,17 @@ class Operator(ABC):
     @classmethod
     @abstractmethod
     def apply(cls, variables: list[Decimal]) -> Decimal:
+        """
+        Apply this operator to *variables* and return the result.
+        """
         pass
 
     @classmethod
     @abstractmethod
     def get_sign(cls) -> str:
+        """
+        Return the sign for this operator.
+        """
         pass
 
 
@@ -23,10 +32,16 @@ class Addition(Operator):
 
     @classmethod
     def apply(cls, variables: list[Decimal]) -> Decimal:
+        """
+        Apply this operator to *variables* and return the result.
+        """
         return sum(variables)
 
     @classmethod
     def get_sign(cls) -> str:
+        """
+        Return the sign for this operator.
+        """
         return "+"
 
 
@@ -34,10 +49,16 @@ class Subtraction(Operator):
 
     @classmethod
     def apply(cls, variables: list[Decimal]) -> Decimal:
+        """
+        Apply this operator to *variables* and return the result.
+        """
         return functools.reduce(lambda x, y: x - y, variables)
 
     @classmethod
     def get_sign(cls) -> str:
+        """
+        Return the sign for this operator.
+        """
         return "-"
 
 
@@ -45,10 +66,16 @@ class Multiplication(Operator):
 
     @classmethod
     def apply(cls, variables: list[Decimal]) -> Decimal:
+        """
+        Apply this operator to *variables* and return the result.
+        """
         return functools.reduce(lambda x, y: x * y, variables)
 
     @classmethod
     def get_sign(cls) -> str:
+        """
+        Return the sign for this operator.
+        """
         return "*"
 
 
@@ -56,10 +83,16 @@ class Division(Operator):
 
     @classmethod
     def apply(cls, variables: list[Decimal]) -> Decimal:
+        """
+        Apply this operator to *variables* and return the result.
+        """
         return functools.reduce(lambda x, y: x / y, variables)
 
     @classmethod
     def get_sign(cls) -> str:
+        """
+        Return the sign for this operator.
+        """
         return "/"
 
 
@@ -91,9 +124,9 @@ class Taskgenerator:
         Return a dictonary which describe's a task.::
 
             {
-                'task':str,
-                'result_decimal_points':int,
-                'correct_answer':Decimal,
+                'task': str,
+                'result_decimal_points': int,
+                'correct_answer': Decimal,
             }
         """
         task = dict()

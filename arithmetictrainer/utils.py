@@ -1,3 +1,6 @@
+"""
+Useful utilities.
+"""
 import configparser
 import time
 from core import Taskgenerator
