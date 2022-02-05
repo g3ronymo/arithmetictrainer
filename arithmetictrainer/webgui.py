@@ -21,6 +21,7 @@ class BaseHandler(BaseHTTPRequestHandler):
     DATA = Path(__file__).parent.joinpath('data')
     INDEX_HTML = DATA.joinpath('html/index.html')
     PLAY_HTML = DATA.joinpath('html/play.html')
+    CSS = DATA.joinpath('html/style.css')
 
 
     taskgen_list = create_taskgenerators_from_file(DATA.joinpath('config'))
@@ -46,6 +47,11 @@ class Handler(BaseHandler):
             raise ValueError(f'[{html_file}] is not a file.')
         with open(html_file) as f:
             html = f.read()
+        with open(html_file) as f:
+            html = f.read()
+        with open(self.CSS) as f:
+            css = f.read()
+        html = html.replace('STYLE', css, 1)
         for key in context:
             html = html.replace(key, context[key])
         return html.encode()

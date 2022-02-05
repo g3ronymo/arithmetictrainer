@@ -2,13 +2,16 @@
 <html>
 <head>
 <title>Arithmetictrainer</title>
+<style>STYLE</style>
 </head>
 <body>
-    <form action='/answer' method="post">
+    <div class="flex-container">
+    <form action="/answer" method="post">
         <label for="answer">Round to RESULT_DECIMAL_POINTS decimal points</label><br>
         <label for="answer">TASK</label><br>
         <input id="answer" name="answer" type="text" required autofocus autocomplete="off">
         <input type="submit" value="Answer">
     </form>
+    </div>
 </body>
 </html>
