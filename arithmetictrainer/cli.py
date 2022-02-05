@@ -35,6 +35,7 @@ def parse_args():
     parser.add_argument(
             '--version', action='version', version=f'%(prog)s {version}'
     )
+    parser.add_argument('-w', '--web', action='store_true')
     return parser.parse_args()
 
 def get_config(args) -> Path:
@@ -73,6 +74,9 @@ def get_answer(task: dict) -> Decimal:
 
 def main():
     args = parse_args()
+    if args.web:
+        import webgui
+        webgui.main()
     taskgen_list = create_taskgenerators_from_file(get_config(args))
     trainer = Arithmetictrainer(taskgen_list)
     started_at = time.time()
