@@ -23,8 +23,8 @@ class BaseHandler(BaseHTTPRequestHandler):
     PLAY_HTML = DATA.joinpath('html/play.html')
     CSS = DATA.joinpath('html/style.css')
 
-
-    taskgen_list = create_taskgenerators_from_file(DATA.joinpath('config'))
+    config = DATA.joinpath('config')
+    taskgen_list = create_taskgenerators_from_file(config)
     trainer = Arithmetictrainer(taskgen_list)
 
     def do_GET(self):
@@ -53,7 +53,7 @@ class Handler(BaseHandler):
             css = f.read()
         html = html.replace('STYLE', css, 1)
         for key in context:
-            html = html.replace(key, context[key])
+            html = html.replace(key, str(context[key]))
         return html.encode()
 
     def main(self):
@@ -97,6 +97,7 @@ class Handler(BaseHandler):
         context = {
                 'RESULT_DECIMAL_POINTS': str(task['result_decimal_points']),
                 'TASK': task['task'],
+                'SOLVED': self.trainer.num_correct_answers,
         }
         html = self.get_html(self.PLAY_HTML, context=context)
         self.wfile.write(html)
@@ -119,7 +120,9 @@ class Handler(BaseHandler):
             print(f'Could not convert "{data}" to Decimal.')
 
 
-def main(port=8000):
+def main(port=8000, config=None):
+    if config != None:
+        Handler.config = config
     with ThreadingHTTPServer(('localhost', port), Handler) as httpd:
         print("serving at port", port)
         try:
