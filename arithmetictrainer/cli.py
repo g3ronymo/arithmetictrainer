@@ -27,15 +27,17 @@ def parse_args():
             help='Number of tasks to solve'
     )
     parser.add_argument(
-            '-c',
-            '--config',
-            type=str,
-            help='Path to configuration file'
+            '-c', '--config', type=str, help='Path to configuration file'
     )
     parser.add_argument(
             '--version', action='version', version=f'%(prog)s {version}'
     )
-    parser.add_argument('-w', '--web', action='store_true')
+    parser.add_argument(
+            '-w', '--web', action='store_true',
+            help='Open run simple http server accessible on localhost:8000 "the port can be specified with -p"')
+    parser.add_argument(
+            '-p', '--port', help='Only used when "--web" is present',
+            type=int, default=8000)
     return parser.parse_args()
 
 def get_config(args) -> Path:
@@ -74,10 +76,11 @@ def get_answer(task: dict) -> Decimal:
 
 def main():
     args = parse_args()
+    config = get_config(args)
     if args.web:
         import webgui
-        webgui.main()
-    taskgen_list = create_taskgenerators_from_file(get_config(args))
+        webgui.main(port=args.port, config=config)
+    taskgen_list = create_taskgenerators_from_file(config)
     trainer = Arithmetictrainer(taskgen_list)
     started_at = time.time()
     for i in range(args.number):
