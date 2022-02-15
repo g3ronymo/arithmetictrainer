@@ -30,5 +30,6 @@ if [ ! -d 'dist' ]
 then 
     mkdir dist
 fi
-python3 -m zipapp arithmetictrainer -p '/usr/bin/env python3' -m 'cli:main' -o dist/arithmetictrainer.pyz
+#python3 -m zipapp arithmetictrainer -p '/usr/bin/env python3' -m 'cli:main'\
+#    -o dist/arithmetictrainer.pyz
 

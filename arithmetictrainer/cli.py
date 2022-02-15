@@ -34,7 +34,7 @@ def parse_args():
     )
     parser.add_argument(
             '-w', '--web', action='store_true',
-            help='Open run simple http server accessible on localhost:8000 "the port can be specified with -p"')
+            help='Open run simple http server accessible on localhost:8000')
     parser.add_argument(
             '-p', '--port', help='Only used when "--web" is present',
             type=int, default=8000)
