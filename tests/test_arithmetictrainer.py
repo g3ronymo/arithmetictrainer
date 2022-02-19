@@ -24,6 +24,8 @@ class ArithmetictrainerTest(unittest.TestCase):
                 core.Taskgenerator(core.Division, -100, 100, 2, 1),
         ]
         self.trainer = core.Arithmetictrainer(taskgens)
+        division_taskgen = core.Taskgenerator(core.Division, -100, 100, 2, 1)
+        self.division_trainer = core.Arithmetictrainer([division_taskgen])
 
     def test_answer(self):
         current_task = self.trainer.current_task
@@ -34,6 +36,8 @@ class ArithmetictrainerTest(unittest.TestCase):
         self.assertEqual(current_task, self.trainer.current_task)
         self.assertTrue(self.trainer.answer(correct_aw))
         self.assertNotEqual(current_task, self.trainer.current_task)
+
+        self.division_trainer.answer(Decimal('0'))
 
 if __name__ == '__main__':
     unittest.main()

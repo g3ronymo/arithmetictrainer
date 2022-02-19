@@ -110,6 +110,7 @@ class Handler(BaseHandler):
         Handler.start_time = time.time()
         taskgen_list = create_taskgenerators_from_file(Handler.config)
         Handler.trainer = Arithmetictrainer(taskgen_list)
+        Handler.trainer.start()
 
     def handle_play_get(self):
         """
@@ -140,7 +141,7 @@ class Handler(BaseHandler):
         except InvalidOperation:
             print(f'Could not convert "{data}" to Decimal.')
         self.send_response(302)
-        if Handler.trainer.num_correct_answers == Handler.num_tasks:
+        if Handler.trainer.solvedTasks() == Handler.num_tasks:
             self.send_header('Location', '/end')
         else:
             self.send_header('Location', '/play')
@@ -153,10 +154,11 @@ class Handler(BaseHandler):
         self.send_response(HTTPStatus.OK.value)
         self.send_header('Content-Type','text/html')
         self.end_headers()
+        stats = Handler.trainer.getStats()
         context = {
-                'SOLVED': Handler.trainer.num_correct_answers,
-                'WRONG_ANSWERS': Handler.trainer.num_incorrect_answers,
-                'TIME': time.time() - Handler.start_time
+                'SOLVED': stats['num_correct_answers'],
+                'WRONG_ANSWERS': stats['num_incorrect_answers'],
+                'TIME': stats['time_since_start']
         }
         html = get_html(END_HTML, css_file=CSS, context=context)
         self.wfile.write(html)

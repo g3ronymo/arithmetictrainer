@@ -17,6 +17,7 @@ fi
 echo "------------------------------------------------------------------------"
 echo build-docs
 pip install sphinx
+pip install furo
 sphinx-build -b html docs/source docs/build/html/
 
 echo "------------------------------------------------------------------------"
@@ -24,12 +25,12 @@ echo "build for pip"
 pip install setuptools wheel
 python3 -m build
 
-echo "------------------------------------------------------------------------"
-echo "build zipapp"
-if [ ! -d 'dist' ]
-then 
-    mkdir dist
-fi
+#echo "------------------------------------------------------------------------"
+#echo "build zipapp"
+#if [ ! -d 'dist' ]
+#then 
+#    mkdir dist
+#fi
 #python3 -m zipapp arithmetictrainer -p '/usr/bin/env python3' -m 'cli:main'\
 #    -o dist/arithmetictrainer.pyz
 

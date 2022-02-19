@@ -82,21 +82,21 @@ def main():
         webgui.main(port=args.port, config=config, num_tasks=args.number)
     taskgen_list = create_taskgenerators_from_file(config)
     trainer = Arithmetictrainer(taskgen_list)
-    started_at = time.time()
-    for i in range(args.number):
-        answer = False
-        while not answer:
-            try:
-                answer = get_answer(trainer.getTask())
-            except KeyboardInterrupt:
-                sys.exit()
-            answer = trainer.answer(answer)
-        print('-' * 3)
-    seconds_needed = time.time() - started_at
+    trainer.start()
+    while trainer.solvedTasks() < args.number:
+        try:
+            answer = get_answer(trainer.getTask())
+            was_correct = trainer.answer(answer)
+            if was_correct:
+                print('*' * 3)
+        except KeyboardInterrupt:
+            break
+    stats = trainer.getStats()
+    print()
     print('*' * 10)
-    print(f'Solved {trainer.num_correct_answers} tasks')
-    print(f'in {seconds_needed} seconds.')
-    print(f'With {trainer.num_incorrect_answers} incorrect answers')
+    print('Solved', stats['num_correct_answers'], 'tasks')
+    print('in', stats['time_since_start'] ,'seconds.')
+    print(f'With', stats['num_incorrect_answers'], 'incorrect answers')
     print('*' * 10)
 
 

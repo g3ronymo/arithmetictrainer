@@ -1,6 +1,7 @@
 """
 Core objects.
 """
+import time
 import random
 import functools
 import decimal
@@ -163,16 +164,52 @@ class Taskgenerator:
             l.append(self._get_number(allow_zero=allow_zero))
         return l
 
-class Arithmetictrainer:
+class BaseArithmetictrainer:
 
     def __init__(self, taskgenerators: list):
         self.taskgenerators = taskgenerators
-        self.num_incorrect_answers = 0
-        self.num_correct_answers = 0
         self.__next__()
 
     def __next__(self):
         self.current_task = random.choice(self.taskgenerators).get_task()
+
+
+class Arithmetictrainer(BaseArithmetictrainer):
+    """
+    .. code:: Python
+
+        trainer = Arithmetictrainer(taskgens)
+        trainer.start()
+        while trainer.solvedTasks() < 10:
+            trainer.getTask()
+            trainer.answer()
+        stats = trainer.getStats()
+        
+    """
+    
+    def __init__(self, taskgenerators: list):
+        self.num_incorrect_answers = 0
+        self.num_correct_answers = 0
+        super().__init__(taskgenerators)
+
+    def start(self):
+        """
+        Start/Reset Arithmetictrainer.
+        """
+        self.num_incorrect_answers = 0
+        self.num_correct_answers = 0
+        self.time_started = time.time()
+        self.__next__()
+
+    def solvedTasks(self) -> int:
+        """
+        Return the number of solved tasks.
+        """
+        return self.num_correct_answers
+
+    def getTask(self) -> dict:
+        """Get the current task"""
+        return self.current_task
 
     def answer(self, answer: Decimal) -> bool:
         """
@@ -186,6 +223,21 @@ class Arithmetictrainer:
         self.num_incorrect_answers += 1
         return False
 
-    def getTask(self) -> dict:
-        """Get the current task"""
-        return self.current_task
+    def getStats(self) -> dict:
+        """
+        Get statistics to the solved tasks.
+        Valid keyes are:
+
+        - time_since_start
+        - num_correct_answers
+        - num_correct_answers
+
+        """
+        stats = {
+                    'time_since_start': time.time() - self.time_started,
+                    'num_incorrect_answers': self.num_incorrect_answers,
+                    'num_correct_answers': self.num_correct_answers,
+                 }
+        return stats
+
+
