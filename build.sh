@@ -14,6 +14,9 @@ fi
 # activate virtual environment
 . .venv/bin/activate
 
+# run tests
+python -m unittest discover -v -s tests/
+
 echo "------------------------------------------------------------------------"
 echo build-docs
 pip install sphinx

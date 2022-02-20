@@ -144,23 +144,25 @@ class Taskgenerator:
 
     def _get_number(self, allow_zero=False) -> Decimal:
         """
-        Get a number in range [min, max].
+        Get a Decimal in range [min, max].
         The number is rounded to  self.variable_decimal__points.
         """
         getcontext().rounding = decimal.ROUND_HALF_UP
-        x = random.randint(self.variable_min, self.variable_max) * random.random()
+        x = random.randint(
+                self.variable_min, self.variable_max) * random.random()
         x = Decimal(x)
         x = round(x, self.variable_decimal_points)
-        while not allow_zero and x == Decimal(0):
-            x = random.randint(self.variable_min, self.variable_max) * random.random()
+        while x == Decimal('0') and not allow_zero:
+            x = random.randint(
+                    self.variable_min, self.variable_max) * random.random()
             x = Decimal(x)
             x = round(x, self.variable_decimal_points)
         return x
 
-    def _get_number_array(self, allow_zero=False) -> list[Decimal]:
-        """Get a list with generated numbers"""
+    def _get_number_array(self, num_vars, allow_zero=False) -> list[Decimal]:
+        """Get a list with generated Decimal numbers"""
         l = []
-        for i in range(self.variable_num):
+        for i in range(num_vars):
             l.append(self._get_number(allow_zero=allow_zero))
         return l
 
