@@ -231,7 +231,7 @@ class Arithmetictrainer(BaseArithmetictrainer):
         Valid keyes are:
 
         - time_since_start
-        - num_correct_answers
+        - num_incorrect_answers
         - num_correct_answers
 
         """

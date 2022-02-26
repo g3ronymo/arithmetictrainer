@@ -26,6 +26,7 @@ sphinx-build -b html docs/source docs/build/html/
 echo "------------------------------------------------------------------------"
 echo "build for pip"
 pip install setuptools wheel
+python3 -m pip install --upgrade build
 python3 -m build
 
 #echo "------------------------------------------------------------------------"

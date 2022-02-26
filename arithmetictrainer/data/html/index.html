@@ -6,9 +6,15 @@
 </head>
 <body>
     <div class="flex-container">
-    <form action="/start" method="get">
-        <input type="submit" value="Start" autofocus>
-    </form>
+        <form action="/answer" method="post">
+            <label for="answer">Round to {{ result_decimal_points }} decimal points</label><br>
+            <label for="answer">{{ task }}</label><br>
+            <input id="answer" name="answer" type="text" required autofocus autocomplete="off">
+            <input type="submit" value="Answer">
+        </form>
+        <p>Solved {{ num_correct_answers }} task</p><br>
+        <p>in {{ time_since_start }} Seconds</p><br>
+        <p>with {{ num_incorrect_answers }} wrong answers.</p><br>
     </div>
 </body>
 </html>

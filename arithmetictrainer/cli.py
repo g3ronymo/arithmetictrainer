@@ -79,7 +79,7 @@ def main():
     config = get_config(args)
     if args.web:
         import webgui
-        webgui.main(port=args.port, config=config, num_tasks=args.number)
+        webgui.main(config=config, port=args.port)
     taskgen_list = create_taskgenerators_from_file(config)
     trainer = Arithmetictrainer(taskgen_list)
     trainer.start()
