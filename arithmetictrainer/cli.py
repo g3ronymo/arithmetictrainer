@@ -10,7 +10,7 @@ from decimal import Decimal, InvalidOperation
 
 sys.path.insert(0, str(Path(__file__).parent))
 from core import Arithmetictrainer
-from utils import create_taskgenerators_from_file
+from core import create_arithmetictrainer_from_files
 from __init__ import version
 
 def parse_args():
@@ -77,13 +77,11 @@ def get_answer(task: dict) -> Decimal:
 def main():
     args = parse_args()
     config = get_config(args)
+    trainer = create_arithmetictrainer_from_files(config)
     if args.web:
         import webgui
-        webgui.main(config=config, port=args.port)
-    taskgen_list = create_taskgenerators_from_file(config)
-    trainer = Arithmetictrainer(taskgen_list)
-    trainer.start()
-    while trainer.solvedTasks() < args.number:
+        webgui.main(trainer, port=args.port)
+    while trainer.getState()['num_correct_answers'] < args.number:
         try:
             answer = get_answer(trainer.getTask())
             was_correct = trainer.answer(answer)
@@ -91,11 +89,11 @@ def main():
                 print('*' * 3)
         except KeyboardInterrupt:
             break
-    stats = trainer.getStats()
+    stats = trainer.getState()
     print()
     print('*' * 10)
     print('Solved', stats['num_correct_answers'], 'tasks')
-    print('in', stats['time_since_start'] ,'seconds.')
+    print('in', stats['seconds_since_started'],'seconds.')
     print(f'With', stats['num_incorrect_answers'], 'incorrect answers')
     print('*' * 10)
 

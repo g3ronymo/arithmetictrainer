@@ -11,5 +11,4 @@ Welcome to Arithmetictrainer's documentation!
    :caption: Contents:
 
    core
-   utils
    cli

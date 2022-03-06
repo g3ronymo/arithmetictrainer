@@ -5,241 +5,205 @@ import time
 import random
 import functools
 import decimal
-from decimal import Decimal, getcontext
-from abc import ABC, abstractmethod
+import json
+import configparser
+from decimal import Decimal, getcontext, InvalidOperation
 
 
-
-class Operator(ABC):
-
-    @classmethod
-    @abstractmethod
-    def apply(cls, variables: list[Decimal]) -> Decimal:
-        """
-        Apply this operator to *variables* and return the result.
-        """
-        pass
-
-    @classmethod
-    @abstractmethod
-    def get_sign(cls) -> str:
-        """
-        Return the sign for this operator.
-        """
-        pass
-
-
-class Addition(Operator):
-
-    @classmethod
-    def apply(cls, variables: list[Decimal]) -> Decimal:
-        """
-        Apply this operator to *variables* and return the result.
-        """
-        return sum(variables)
-
-    @classmethod
-    def get_sign(cls) -> str:
-        """
-        Return the sign for this operator.
-        """
-        return "+"
-
-
-class Subtraction(Operator):
-
-    @classmethod
-    def apply(cls, variables: list[Decimal]) -> Decimal:
-        """
-        Apply this operator to *variables* and return the result.
-        """
-        return functools.reduce(lambda x, y: x - y, variables)
-
-    @classmethod
-    def get_sign(cls) -> str:
-        """
-        Return the sign for this operator.
-        """
-        return "-"
-
-
-class Multiplication(Operator):
-
-    @classmethod
-    def apply(cls, variables: list[Decimal]) -> Decimal:
-        """
-        Apply this operator to *variables* and return the result.
-        """
-        return functools.reduce(lambda x, y: x * y, variables)
-
-    @classmethod
-    def get_sign(cls) -> str:
-        """
-        Return the sign for this operator.
-        """
-        return "*"
-
-
-class Division(Operator):
-
-    @classmethod
-    def apply(cls, variables: list[Decimal]) -> Decimal:
-        """
-        Apply this operator to *variables* and return the result.
-        """
-        return functools.reduce(lambda x, y: x / y, variables)
-
-    @classmethod
-    def get_sign(cls) -> str:
-        """
-        Return the sign for this operator.
-        """
-        return "/"
-
-
-class Taskgenerator:
-    """Generat Tasks"""
-
-    def __init__(
-            self,
-            operator: Operator,
-            variable_min: int,
-            variable_max: int,
-            variable_num: int,
-            variable_decimal_points: int
-            ):
-        if variable_min >= variable_max:
-            raise ValueError('"variable_min" is not less than "variable_max"')
-        if variable_num < 2:
-            raise ValueError('"variable_num" can not be less than 2')
-        if variable_decimal_points < 0:
-            raise ValueError('"variable_decimal_points" can not be less than zero')
-        self.variable_min = variable_min
-        self.variable_max = variable_max
-        self.operator = operator
-        self.variable_num = variable_num
-        self.variable_decimal_points = variable_decimal_points
-
-    def get_task(self) -> dict:
-        """
-        Return a dictonary which describe's a task.::
-
-            {
-                'task': str,
-                'result_decimal_points': int,
-                'correct_answer': Decimal,
-            }
-        """
-        task = dict()
-        variables = self._get_number_array(self.variable_num)
-        x = self.operator.apply(variables)
-        task['correct_answer'] = round(x, self.variable_decimal_points)
-        task['result_decimal_points'] = self.variable_decimal_points
-        task_str = ""
-        for i in range(len(variables)-1):
-            task_str += str(variables[i]) + ' ' + self.operator.get_sign()
-        task_str += ' ' + str(variables[-1])
-        task['task'] = task_str
-        return task
-
-    def _get_number(self, allow_zero=False) -> Decimal:
-        """
-        Get a Decimal in range [min, max].
-        The number is rounded to  self.variable_decimal__points.
-        """
-        getcontext().rounding = decimal.ROUND_HALF_UP
-        x = random.randint(
-                self.variable_min, self.variable_max) * random.random()
+def get_number(var_min, var_max, decimal_points, allow_zero=False) -> Decimal:
+    """
+    Get a Decimal in range [var_min, var_max].
+    The number is rounded to  variable_decimal_points.
+    """
+    if var_min >= var_max:
+        raise ValueError('"var_min" >= "var_max"')
+    if decimal_points < 0:
+        raise ValueError('"decimal_points" < 0')
+    getcontext().rounding = decimal.ROUND_HALF_UP
+    x = random.randint(var_min, var_max) * random.random()
+    x = Decimal(x)
+    x = round(x, decimal_points)
+    while x == Decimal('0') and not allow_zero:
+        x = random.randint(var_min, var_max) * random.random()
         x = Decimal(x)
-        x = round(x, self.variable_decimal_points)
-        while x == Decimal('0') and not allow_zero:
-            x = random.randint(
-                    self.variable_min, self.variable_max) * random.random()
-            x = Decimal(x)
-            x = round(x, self.variable_decimal_points)
-        return x
+        x = round(x, decimal_points)
+    return x
 
-    def _get_number_array(self, num_vars, allow_zero=False) -> list[Decimal]:
-        """Get a list with generated Decimal numbers"""
-        l = []
-        for i in range(num_vars):
-            l.append(self._get_number(allow_zero=allow_zero))
-        return l
-
-class BaseArithmetictrainer:
-
-    def __init__(self, taskgenerators: list):
-        self.taskgenerators = taskgenerators
-        self.__next__()
-
-    def __next__(self):
-        self.current_task = random.choice(self.taskgenerators).get_task()
-
-
-class Arithmetictrainer(BaseArithmetictrainer):
+def get_number_array(num_vars, var_min, var_max, decimal_points, allow_zero=False) -> list[Decimal]:
     """
-    .. code:: Python
-
-        trainer = Arithmetictrainer(taskgens)
-        trainer.start()
-        while trainer.solvedTasks() < 10:
-            trainer.getTask()
-            trainer.answer()
-        stats = trainer.getStats()
-        
+    Get a list with generated Decimal numbers. 
+    The numbers are in range [var_min, var_max] and rounded to 
+    variable_decimal_points.
     """
-    
-    def __init__(self, taskgenerators: list):
-        self.num_incorrect_answers = 0
-        self.num_correct_answers = 0
-        super().__init__(taskgenerators)
+    l = []
+    for i in range(num_vars):
+        l.append(get_number(var_min, var_max, decimal_points, allow_zero=allow_zero))
+    return l
 
-    def start(self):
-        """
-        Start/Reset Arithmetictrainer.
-        """
-        self.num_incorrect_answers = 0
-        self.num_correct_answers = 0
-        self.time_started = time.time()
-        self.__next__()
+class Arithmetictrainer:
 
-    def solvedTasks(self) -> int:
+    def __init__(self, config: list[dict], current_task=None, state=None):
         """
-        Return the number of solved tasks.
+        current_task:
+            A task as returned by the getTask method.
+        state:
+            A state as returned by the getState method.
+        config:
+            A config as returned by the getConfig method.
         """
-        return self.num_correct_answers
+        self.config = config
+        if current_task is not None:
+            self.current_task = current_task
+        else:
+            next(self)
+        if state is None:
+            state = {
+                    'started_at': time.time(),
+                    'num_correct_answers': 0,
+                    'num_incorrect_answers': 0,
+            }
+        self.state = state
+            
+
+    def getState(self) -> dict:
+        """
+        Get the state of the Arithmetictrainer. Valid keyes are:
+
+        - started_at: float
+        - seconds_since_started: float
+        - num_incorrect_answers: str
+        - num_correct_answers: str
+        """
+        self.state['seconds_since_started'] = time.time() - self.state['started_at'] 
+        return self.state
+
+    def getConfig(self) -> list[dict]:
+        """
+        Get the config of Arithmetictrainer. Each dictonary in the
+        list contains the following keyes:
+
+        operator: str
+            A sign which describes the operator.
+        variable_num: int
+            The number of variables
+        variable_min: int
+            The smallest possible variable
+        variable_max: int
+            The largest possible variable
+        variable_decimal_points: int
+            The decimal points of each variable
+        result_decimal_points: int
+            The decimal points the result is rounded to.
+        """
+        return self.config
 
     def getTask(self) -> dict:
-        """Get the current task"""
+        """
+            Return a dictonary which describe's a task.::
+
+                {
+                    'task': str,
+                    'result_decimal_points': int,
+                    'correct_answer': str,
+                }
+        """
         return self.current_task
 
-    def answer(self, answer: Decimal) -> bool:
+
+    def answer(self, answer: str | Decimal):
         """
-        Answer the current task. If the answer is correct return True,
-        else False.
+        Answer the current_task. If answer was correct return true, else false
         """
-        if answer.compare(self.current_task['correct_answer']) == Decimal('0'):
-            self.num_correct_answers += 1
-            self.__next__()
+        try:
+            answer = Decimal(answer)
+        except InvalidOperation:
+            answer = None
+        if answer == Decimal(self.getTask()['correct_answer']):
+            self.state['num_correct_answers'] += 1
+            next(self)
             return True
-        self.num_incorrect_answers += 1
+        self.state['num_incorrect_answers'] += 1
         return False
 
-    def getStats(self) -> dict:
+    
+    def toJsonSerializable(self):
         """
-        Get statistics to the solved tasks.
-        Valid keyes are:
-
-        - time_since_start
-        - num_incorrect_answers
-        - num_correct_answers
-
+        Return an object that represents a Arithmetictrainer and can be
+        converted to json with for example *json.dumps*.
         """
-        stats = {
-                    'time_since_start': time.time() - self.time_started,
-                    'num_incorrect_answers': self.num_incorrect_answers,
-                    'num_correct_answers': self.num_correct_answers,
-                 }
-        return stats
+        return [self.getConfig(), self.getTask(), self.getState()]
 
+    def __next__(self):
+        """
+        Set and Return the next task
+        """
+        result = {}
+        conf = random.choice(self.config)
+        variables = get_number_array(
+                conf['variable_num'], 
+                conf['variable_min'],
+                conf['variable_max'],
+                conf['variable_decimal_points'],
+        )
+        match conf['operator']:
+            case '+':
+                correct_answer = sum(variables)
+            case '-':
+                correct_answer = functools.reduce(lambda x, y: x - y, variables)
+            case '*':
+                correct_answer = functools.reduce(lambda x, y: x * y, variables)
+            case '/' | ':':
+                correct_answer = functools.reduce(lambda x, y: x / y, variables)
+            case _:
+                raise ValueError(f'[{conf["operator"]}] is not a valid operator')
+        result['correct_answer'] = round(
+                correct_answer, conf['variable_decimal_points'])
+        result['correct_answer'] = str(result['correct_answer'])
+        result['result_decimal_points'] = conf['result_decimal_points']
+        result['task'] = functools.reduce(
+                lambda x, y: '{} {} {}'.format(x, conf['operator'], y), variables)
+        self.current_task = result
+        return result
+
+    def __eq__(self, other) -> bool:
+        if self.getConfig() != other.getConfig():
+            return False
+        if self.getTask() != other.getTask():
+            return False
+        if self.getState()['started_at'] != other.getState()['started_at']:
+            return False
+        return True
+
+
+
+def arithmetictrainerFromJson(json_arithmetictrainer) -> Arithmetictrainer:
+    """
+    Create an Arithmetictrainer from a Json array as returned by the
+    *Arithmetictrainer.toJsonSerializable* method.
+    """
+    l = json.loads(json_arithmetictrainer)
+    return Arithmetictrainer(*l)
+
+
+def create_arithmetictrainer_from_files(*files) -> Arithmetictrainer:
+    """
+    Create a Arithmetictrainer from a configuration file.
+    """
+    config_files = configparser.ConfigParser()
+    config_files.read(*files)
+    if len(config_files.sections()) == 0:
+        raise ValueError("Could not find a valid config in: ", *files)
+    config = []
+    for section in config_files.sections():
+        tmp = {}
+        tmp['operator'] = config_files[section]['operator']
+        tmp['variable_num'] = config_files.getint(section, 'variable_num')
+        tmp['variable_min'] = config_files.getint(section, 'variable_min')
+        tmp['variable_max'] = config_files.getint(section, 'variable_max')
+        tmp['variable_decimal_points'] = config_files.getint(
+                section, 'variable_decimal_points')
+        tmp['result_decimal_points'] = config_files.getint(
+                section, 'result_decimal_points')
+        config.append(tmp)
+    return Arithmetictrainer(config)
 

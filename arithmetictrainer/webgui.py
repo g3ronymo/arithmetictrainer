@@ -17,7 +17,6 @@ from pathlib import Path
 from decimal import Decimal, InvalidOperation
 
 from core import Arithmetictrainer
-from utils import create_taskgenerators_from_file
 
 DATA = Path(__file__).parent.joinpath('data')
 HTML = DATA.joinpath('html/index.html')
@@ -59,7 +58,8 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         task = trainer.getTask()
         context = trainer.getTask()
-        context.update(trainer.getStats())
+        context.update(trainer.getState())
+        context['time_since_start'] = time.time() - trainer.getState()['started_at']
         html = get_html(HTML, css_file=CSS, context=context)
         self.wfile.write(html)
 
@@ -79,11 +79,9 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
 
-def main(config, port=8000):
-    global trainer
-    taskgen_list = create_taskgenerators_from_file(config)
-    trainer = Arithmetictrainer(taskgen_list)
-    trainer.start()
+def main(arithmetictrainer: Arithmetictrainer, port=8000):
+    global trainer 
+    trainer = arithmetictrainer
     with ThreadingHTTPServer(('localhost', port), Handler) as httpd:
         webbrowser.open_new_tab('localhost' + ':' + str(port))
         print("serving at port", port)
