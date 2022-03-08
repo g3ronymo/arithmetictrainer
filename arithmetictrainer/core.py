@@ -51,18 +51,20 @@ class Arithmetictrainer:
         config:
             A config as returned by the getConfig method.
         """
-        self.config = config
-        if current_task is not None:
-            self.current_task = current_task
-        else:
-            next(self)
+        if len(config) <= 0:
+            raise ValueError('Not a valid config')
         if state is None:
             state = {
                     'started_at': time.time(),
                     'num_correct_answers': 0,
                     'num_incorrect_answers': 0,
             }
+        self.config = config
         self.state = state
+        if current_task is not None:
+            self.current_task = current_task
+        else:
+            next(self)
             
 
     def getState(self) -> dict:

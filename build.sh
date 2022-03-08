@@ -2,13 +2,18 @@
 echo "This script assumes:"
 echo "- the current working directory is the top level git directory of the"
 echo "  arithmetictrainer repository"
-echo "- there is a virtual environment in the .venv directory"
 echo ""
 echo "Continue? [Y/n]"
 read
 if [ "$REPLY" = "n" ] || [ "$REPLY" = "N" ] || [ "$REPLY" = "no" ] || [ "$REPLY" = "No" ]
 then
     exit 0
+fi
+
+# if needed create virtual environment
+if [ ! -d ./venv ]
+then 
+    python -m venv .venv
 fi
 
 # activate virtual environment
@@ -19,14 +24,13 @@ python -m unittest discover -v -s tests/
 
 echo "------------------------------------------------------------------------"
 echo build-docs
-pip install sphinx
-pip install furo
+pip install --upgrade sphinx
+pip install --upgrade furo
 sphinx-build -b html docs/source docs/build/html/
 
 echo "------------------------------------------------------------------------"
 echo "build for pip"
-pip install setuptools wheel
-python3 -m pip install --upgrade build
+pip install --upgrade setuptools wheel build
 python3 -m build
 
 #echo "------------------------------------------------------------------------"
