@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "arithmetictrainer"
+description = "Train basic arithmetic"
+readme = "README.rst"
+requires-python = ">=3.10"
+keywords = []
+license = {text = "MIT"}
+classifiers = [
+        "Programming Language :: Python :: 3",
+        ]
+dynamic = ["version"]
+dependencies = ["pyxdg"]
+
+[tool.setuptools]
+packages = ["arithmetictrainer"]
+
+[tool.setuptools.dynamic]
+version = {attr = "arithmetictrainer.version"}
+
+[project.scripts]
+arithmetictrainer = "arithmetictrainer.cli:main"
+
