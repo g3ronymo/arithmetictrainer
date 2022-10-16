@@ -4,7 +4,7 @@ Arithmetictrainer
 
 ``Arithmetictrainer`` can be used to practice basic arithmetic.
 
- Depends on:
+Depends on:
 
 - python >=3.10.
 - pyxdg (https://freedesktop.org/wiki/Software/pyxdg/)
